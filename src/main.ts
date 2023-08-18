@@ -6,7 +6,7 @@
 
 /*
  * main.js
- * Author: Roshan Poudel, Sherry Khan
+ * Author: Roshan Poudel
 */
 
 import * as THREE from 'three';
