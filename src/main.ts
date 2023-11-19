@@ -6,6 +6,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { insideWorld } from './core/sceneSetup';
+import { Character } from './core/character';
 
 let camera: THREE.PerspectiveCamera; let scene: THREE.Scene; let
   renderer: THREE.WebGLRenderer;
@@ -32,7 +33,7 @@ function fillScene() {
   scene.add(light);
 
   // MATERIALS
-  const path = '../assets/textures/skybox/';
+  const path = '/assets/textures/skybox/';
   const urls = [`${path}px.jpg`, `${path}nx.jpg`,
     `${path}py.jpg`, `${path}ny.jpg`,
     `${path}pz.jpg`, `${path}nz.jpg`];
@@ -59,13 +60,12 @@ function fillScene() {
 
   // CHARACTER
   // Create and add Steve character to the scene
-  // let gameCharacter = new Character();
-  // let characterMesh = gameCharacter.getMesh();
-  // characterMesh.position.set(0, 0, 0);
-  // characterMesh.rotation.x = -Math.PI / 2.2;
-  // characterMesh.position.y = -100;
-  // characterMesh.receiveShadow = true;
-  // scene.add(characterMesh);
+  const gameCharacter = new Character();
+  const characterMesh = gameCharacter.getMesh();
+  characterMesh.position.set(0, 0, 1800);
+  characterMesh.position.y = -1300;
+  characterMesh.receiveShadow = true;
+  scene.add(characterMesh);
 }
 
 function init() {

@@ -1,75 +1,93 @@
-// Initialize scene, camera, and renderer
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+import * as THREE from 'three';
 
-// Create the character components
-const head = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), new THREE.MeshBasicMaterial({ color: 0xffd700 }));
-const torso = new THREE.Mesh(new THREE.BoxGeometry(2, 3, 1), new THREE.MeshBasicMaterial({ color: 0x0000ff }));
-const arm1 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 3, 0.5), new THREE.MeshBasicMaterial({ color: 0xff6347 }));
-const arm2 = arm1.clone();
-const leg1 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 3, 0.5), new THREE.MeshBasicMaterial({ color: 0x008000 }));
-const leg2 = leg1.clone();
+/* eslint-disable max-classes-per-file */
 
-// Position the components
-head.position.y = 4;
-torso.position.y = 2.5;
-arm1.position.y = 2.5;
-arm1.position.x = -1.25;
-arm2.position.y = 2.5;
-arm2.position.x = 1.25;
-leg1.position.y = 0.5;
-leg1.position.x = -0.5;
-leg2.position.y = 0.5;
-leg2.position.x = 0.5;
+/*
+  * Class representing a part of the character
+  * @param {THREE.Geometry} geometry - The geometry of the part
+  * @param {THREE.Material} material - The material of the part
+  * @param {Object} position - The position of the part with respect to the parent
+  * @param {THREE.Object3D} parent - The parent of the part
+  */
+class CharacterPart {
+  mesh: THREE.Mesh<any, any, THREE.Object3DEventMap>;
 
-// Create a group and add the components
-const character = new THREE.Group();
-character.add(head);
-character.add(torso);
-character.add(arm1);
-character.add(arm2);
-character.add(leg1);
-character.add(leg2);
-
-// Add the character to the scene
-scene.add(character);
-
-// Create ground
-const groundGeometry = new THREE.PlaneGeometry(100, 5);
-const groundMaterial = new THREE.MeshBasicMaterial({ color: 0x228B22, side: THREE.DoubleSide });
-const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-ground.rotation.x = -Math.PI / 2;
-ground.position.y = -1;
-scene.add(ground);
-
-// Set camera position
-camera.position.z = 10;
-
-// Animation variables
-const clock = new THREE.Clock();
-const runningSpeed = 10;
-
-// Animation function
-function animate() {
-  requestAnimationFrame(animate);
-
-  const time = clock.getElapsedTime();
-  const delta = clock.getDelta();
-
-  // Simulate running by rotating arms and legs
-  arm1.rotation.x = Math.sin(time * runningSpeed) * Math.PI / 4;
-  arm2.rotation.x = -Math.sin(time * runningSpeed) * Math.PI / 4;
-  leg1.rotation.x = -Math.sin(time * runningSpeed) * Math.PI / 4;
-  leg2.rotation.x = Math.sin(time * runningSpeed) * Math.PI / 4;
-
-  // Move the ground to simulate running forward
-  ground.position.z = (ground.position.z + delta * 5) % 100;
-
-  renderer.render(scene, camera);
+  constructor(geometry, material, position: { x: number, y: number, z: number }, parent) {
+    this.mesh = new THREE.Mesh(geometry, material);
+    if (position) {
+      this.mesh.position.set(position.x, position.y, position.z);
+    }
+    if (parent) {
+      parent.add(this.mesh);
+    }
+  }
 }
 
-// Start animation loop
-animate();
+/*
+  * Class representing the character
+  */
+export class Character {
+  character: any;
+
+  constructor() {
+    // Create a new Object3D to represent the character
+    this.character = new THREE.Object3D();
+    this.createBody();
+  }
+
+  // Method to create the body of the character
+  createBody() {
+    // Define dimensions and materials
+    const w = 250; // Width of the character
+    const h = 500; // Height of the character
+    const d = 125; // Depth of the character
+    const limbH = (3.0 / 8.0) * h; // Height of the limbs (3/8th of the character height)
+    const headH = (2.0 / 8.0) * h; // Height of the head (2/8th of the character height)
+    const limbW = (1.0 / 4.0) * w; // Width of the limbs (1/4th of the character width)
+    const chestW = (1.0 / 2.0) * w; // Width of the chest (1/2th of the character width)
+    const headW = (1.0 / 2.0) * w; // Width of the head (1/2th of the character width)
+    const limbD = (1.0 / 2.0) * d; // Depth of the limbs (1/2th of the character depth)
+    const headD = d + 20; // Depth of the head (little bigger the character depth)
+    // Material for the character
+    const characterMaterial = new THREE.MeshStandardMaterial({
+      color: 0x00ff00,
+      castShadow: true,
+      specular: 0x009900,
+      shininess: 30,
+    });
+    const limbG = new THREE.BoxGeometry(limbW, limbH, limbD); // Geometry for the limbs
+    const chestG = new THREE.BoxGeometry(chestW, limbH, limbD); // Geometry for the chest
+    const headG = new THREE.BoxGeometry(headW, headH, headD); // Geometry for the head
+
+    // Create body parts
+    const upperBody = new THREE.Object3D(); // Object representing the upper body
+    const torso = new THREE.Object3D(); // Object representing the torso
+    const legs = new THREE.Object3D(); // Object representing the legs
+
+    // Create legs
+    new CharacterPart(limbG, characterMaterial, { x: -0.8 * limbW, y: limbH, z: 0 }, legs); // Create left leg
+    new CharacterPart(limbG, characterMaterial, { x: 0.8 * limbW + 0.1, y: limbH, z: 0 }, legs); // Create right leg
+
+    // Create torso
+    new CharacterPart(chestG, characterMaterial, { x: 0, y: 100, z: 0 }, torso); // Create torso
+
+    // Create arms
+    new CharacterPart(limbG, characterMaterial, { x: -0.6 * chestW - 0.5 * limbW - 0.1, y: 0.5 * limbH, z: 0 }, torso); // Create left arm
+    new CharacterPart(limbG, characterMaterial, { x: 0.6 * chestW + 0.5 * limbW + 0.1, y: 0.5 * limbH, z: 0 }, torso); // Create right arm
+
+    // Create head
+    // Here we can add custom material for head if needed
+    new CharacterPart(headG, characterMaterial, { x: 0, y: limbH * 0.5 + headH * 0.5 + 110, z: 0 }, upperBody); // Create head
+
+    // Assemble character
+    upperBody.add(torso); // Add torso to the upper body
+    upperBody.position.y = limbH + (0.5 * limbH) + 0.1; // Set the position of the upper body
+    this.character.add(upperBody); // Add upper body to the character
+    this.character.add(legs); // Add legs to the character
+  }
+
+  // Method to get the character mesh
+  getMesh() {
+    return this.character;
+  }
+}

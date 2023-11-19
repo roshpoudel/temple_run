@@ -12,6 +12,11 @@ module.exports = {
   ],
   rules: {
     'import/extensions': 'off',
+    'import/prefer-default-export': 'off',
+    'max-classes-per-file': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-unsafe-member-access': 'off',
+    '@typescript-eslint/no-unsafe-call': 'off',
   },
   ignorePatterns: ['src/**/*.test.ts', 'src/frontend/generated/*'],
 };
