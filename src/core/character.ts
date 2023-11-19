@@ -41,7 +41,7 @@ scene.add(character);
 const groundGeometry = new THREE.PlaneGeometry(100, 5);
 const groundMaterial = new THREE.MeshBasicMaterial({ color: 0x228B22, side: THREE.DoubleSide });
 const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-ground.rotation.x = - Math.PI / 2;
+ground.rotation.x = -Math.PI / 2;
 ground.position.y = -1;
 scene.add(ground);
 
@@ -49,29 +49,27 @@ scene.add(ground);
 camera.position.z = 10;
 
 // Animation variables
-let clock = new THREE.Clock();
-let runningSpeed = 10;
+const clock = new THREE.Clock();
+const runningSpeed = 10;
 
 // Animation function
 function animate() {
-    requestAnimationFrame(animate);
+  requestAnimationFrame(animate);
 
-    let time = clock.getElapsedTime();
-    let delta = clock.getDelta();
+  const time = clock.getElapsedTime();
+  const delta = clock.getDelta();
 
-    // Simulate running by rotating arms and legs
-    arm1.rotation.x = Math.sin(time * runningSpeed) * Math.PI / 4;
-    arm2.rotation.x = -Math.sin(time * runningSpeed) * Math.PI / 4;
-    leg1.rotation.x = -Math.sin(time * runningSpeed) * Math.PI / 4;
-    leg2.rotation.x = Math.sin(time * runningSpeed) * Math.PI / 4;
+  // Simulate running by rotating arms and legs
+  arm1.rotation.x = Math.sin(time * runningSpeed) * Math.PI / 4;
+  arm2.rotation.x = -Math.sin(time * runningSpeed) * Math.PI / 4;
+  leg1.rotation.x = -Math.sin(time * runningSpeed) * Math.PI / 4;
+  leg2.rotation.x = Math.sin(time * runningSpeed) * Math.PI / 4;
 
-    // Move the ground to simulate running forward
-    ground.position.z = (ground.position.z + delta * 5) % 100;
+  // Move the ground to simulate running forward
+  ground.position.z = (ground.position.z + delta * 5) % 100;
 
-    renderer.render(scene, camera);
+  renderer.render(scene, camera);
 }
 
 // Start animation loop
 animate();
-
-
