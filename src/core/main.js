@@ -55,13 +55,13 @@ function fillScene() {
 
 	// CHARACTER
 	// Create and add Steve character to the scene
-	// let gameCharacter = new Character();
-	// let characterMesh = gameCharacter.getMesh();
-	// characterMesh.position.set(0, 0, 0);
-	// characterMesh.rotation.x = -Math.PI / 2.2;
-    // characterMesh.position.y = -100;
-	// characterMesh.receiveShadow = true;
-	// scene.add(characterMesh);
+	let gameCharacter = new Character();
+	let characterMesh = gameCharacter.getMesh();
+	characterMesh.position.set(0, 0, 0);
+	characterMesh.rotation.x = -Math.PI / 2.2;
+    characterMesh.position.y = -1000;
+	characterMesh.receiveShadow = true;
+	scene.add(characterMesh);
 }
 
 function init() {
