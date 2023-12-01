@@ -17,8 +17,8 @@ function createGroundPlane(texture: Texture) {
     console.log('Texture not applied to material');
   }
   const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-  ground.rotation.x = -Math.PI / 2.2;
-  ground.position.y = -1000;
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -1200;
   ground.receiveShadow = true;
   return ground;
 }

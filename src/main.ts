@@ -1,3 +1,5 @@
+/* eslint-disable one-var */
+/* eslint-disable default-case */
 /*
  * main.js
  * Author: Roshan Poudel, Sherry Khan
@@ -7,10 +9,14 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { insideWorld } from './core/sceneSetup';
 import { Character } from './core/character';
+import Obstacle from './core/obstacle';
 
-let camera: THREE.PerspectiveCamera; let scene: THREE.Scene; let
-  renderer: THREE.WebGLRenderer;
+let camera: THREE.PerspectiveCamera;
+let scene: THREE.Scene;
+let renderer: THREE.WebGLRenderer;
 let cameraControls: OrbitControls;
+let gameCharacter: Character;
+let obstacles: Obstacle[] = [];
 
 const clock = new THREE.Clock();
 
@@ -60,12 +66,25 @@ function fillScene() {
 
   // CHARACTER
   // Create and add Steve character to the scene
-  const gameCharacter = new Character();
+  gameCharacter = new Character();
   const characterMesh = gameCharacter.getMesh();
-  characterMesh.position.set(0, 0, 1800);
-  characterMesh.position.y = -1300;
-  characterMesh.receiveShadow = true;
+  characterMesh.position.set(0, -1100, 1800);
+  // characterMesh.position.y = -1300;
+  characterMesh.castShadow = true;
   scene.add(characterMesh);
+
+  // Create and add obstacles to the scene
+  createObstacles();
+}
+
+// OBSATCLES
+function createObstacles() {
+  // Create 5 obstacles for now
+  for (let i = 0; i < 5; i++) {
+    const obstacle = new Obstacle();
+    obstacles.push(obstacle);
+    scene.add(obstacle.mesh); // Add obstacle mesh to the scene
+  }
 }
 
 function init() {
@@ -106,8 +125,10 @@ function render() {
 
   renderer.render(scene, camera);
 }
+
 function animate() {
   requestAnimationFrame(animate);
+  update(clock.getDelta());
   render();
 }
 
@@ -118,30 +139,52 @@ function onWindowResize() {
   render();
 }
 
-// function createGround(texture) {
-// let groundGeometry = new THREE.PlaneGeometry(2000, 4000);
-// let groundMaterial = new THREE.MeshPhongMaterial({ color: 0x888888, map: texture,
-// side: THREE.DoubleSide, transparent: false, opacity: 1 });
-// if (!groundMaterial.map) {
-// console.log('Texture not applied to material');
-// }
-// let ground = new THREE.Mesh(groundGeometry, groundMaterial);
-// ground.rotation.x = -Math.PI / 2.2;
-// ground.position.y = -100;
-// scene.add(ground);
-// render();
-// }
+const KEY_UP = 38;
+const KEY_W = 87;
+const KEY_LEFT = 37;
+const KEY_A = 65;
+const KEY_DOWN = 40;
+const KEY_S = 83;
+const KEY_RIGHT = 39;
+const KEY_D = 68;
+const KEY_SPACE = 32;
+// const FPS = 60;
 
-// //loading textures
-// let loader = new THREE.TextureLoader();
-// loader.load("../assets/textures/groundplane/floor.jpg", function (texture) {
-// if (!texture) {
-// console.log('Texture loading failed');
-// return;
-// }
-// console.log('Texture loaded successfully');
-// createGround(texture);
-// });
+const keyState = Object.create(null) as Record<number, boolean>;
+
+window.addEventListener('keydown', (event: KeyboardEvent) => {
+  keyState[event.keyCode] = true; 
+  // Check if the spacebar is pressed
+  if (event.keyCode === KEY_SPACE) {
+    gameCharacter.jump(); // Call the jump method on character object
+  }
+});
+
+window.addEventListener('keyup', (event: KeyboardEvent) => { 
+  keyState[event.keyCode] = false;
+});
+
+function update(delta: number) {
+  let x = 0, z = 0;
+
+  if (keyState[KEY_UP] || keyState[KEY_W]) z += 1;
+  if (keyState[KEY_LEFT] || keyState[KEY_A]) x += 1;
+  if (keyState[KEY_DOWN] || keyState[KEY_S]) z += -1;
+  if (keyState[KEY_RIGHT] || keyState[KEY_D]) x += -1;
+
+  gameCharacter.move(x, z);
+  gameCharacter.update(delta); // Update the character for jumping and other animations
+
+  // Update the obstacles
+  // Update each obstacle
+  obstacles.forEach(obstacle => {
+    obstacle.update();
+  });
+
+  render();
+}
+
+// setInterval(update, 1000 / FPS); // update FPS times per second
 
 init();
 fillScene();
