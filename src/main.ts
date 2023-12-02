@@ -57,6 +57,10 @@ function fillScene() {
   scene.add(light);
 
   // MATERIALS
+  // for build version --> '/pouder0/CS360/Project6_Alpha/dist/assets/textures/skybox/'
+  // for dev version --> '/assets/textures/skybox/'
+
+  // const path = '/pouder0/CS360/Project6_Alpha/dist/assets/textures/skybox/';
   const path = '/assets/textures/skybox/';
   const urls = [`${path}px.jpg`, `${path}nx.jpg`,
     `${path}py.jpg`, `${path}ny.jpg`,
@@ -143,8 +147,8 @@ function render() {
 
 function animate() {
   if (!animationActive) {
-    render();
     animationId = undefined;
+    render();
     return; // Stop the function if the animation should no longer be active
   }
 
@@ -176,10 +180,12 @@ const keyState = Object.create(null) as Record<number, boolean>;
 
 window.addEventListener('keydown', (event: KeyboardEvent) => {
   keyState[event.keyCode] = true;
+
   // Check if the spacebar is pressed
   if (event.keyCode === KEY_SPACE) {
     gameCharacter.jump(); // Call the jump method on character object
   }
+
   if (event.keyCode === KEY_R) {
     // Reset game stats
     lastObstacleSpawnTime = 0;
@@ -202,6 +208,15 @@ window.addEventListener('keydown', (event: KeyboardEvent) => {
 window.addEventListener('keyup', (event: KeyboardEvent) => {
   keyState[event.keyCode] = false;
 });
+
+function gameOver() {
+  showGameOverScreen(scene); // Display the game over screen
+  animationActive = false; // Set the flag to stop the animation loop
+  if (animationId !== undefined) {
+    cancelAnimationFrame(animationId); // Cancel the current animation frame request
+  }
+  render(); // Update the rendering
+}
 
 function update(delta: number) {
   let x = 0,
@@ -248,15 +263,6 @@ function update(delta: number) {
   });
 
   // render();
-}
-
-function gameOver() {
-  showGameOverScreen(scene); // Display the game over screen
-  render(); // Update the rendering immediately
-  animationActive = false; // Set the flag to stop the animation loop
-  if (animationId !== undefined) {
-    cancelAnimationFrame(animationId); // Cancel the current animation frame request
-  }
 }
 
 // setInterval(update, 1000 / FPS); // update FPS times per second

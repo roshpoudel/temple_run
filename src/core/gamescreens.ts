@@ -8,7 +8,13 @@ export function showGameOverScreen(scene: THREE.Scene) {
   const ttfloader = new TTFLoader();
 
   // Load font
-  ttfloader.load('/assets/textures/fonts/game_over.ttf', (json) => {
+  // for build version --> '/pouder0/CS360/Project6_Alpha/dist/assets/textures/fonts/game_over.ttf'
+  // for dev version --> '/assets/textures/fonts/game_over.ttf'
+
+  // const path = '/pouder0/CS360/Project6_Alpha/dist/assets/textures/fonts/game_over.ttf';
+  const path = '/assets/textures/fonts/game_over.ttf';
+
+  ttfloader.load(path, (json) => {
     // Parse the font
     const font = new FontLoader().parse(json);
 

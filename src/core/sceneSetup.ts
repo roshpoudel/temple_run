@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 // This file contains function to create the objects for the game inside the textured 3D world.
 // Path: src/core/sceneSetup.js
 
@@ -25,7 +26,14 @@ function createGroundPlane(texture: Texture) {
 
 export function insideWorld(scene: Scene) {
   const loader = new THREE.TextureLoader();
-  loader.load('/assets/textures/groundplane/floor.png', (texture) => {
+
+  // for build version --> '/pouder0/CS360/Project6_Alpha/dist/assets/textures/groundplane/floor.png'
+  // for dev version --> '/assets/textures/groundplane/floor.png'
+
+  const path = '/assets/textures/groundplane/floor.png';
+  // const path = '/pouder0/CS360/Project6_Alpha/dist/assets/textures/groundplane/floor.png';
+
+  loader.load(path, (texture) => {
     console.log('Texture loaded successfully', texture);
     groundPlane = createGroundPlane(texture);
     scene.add(groundPlane);
