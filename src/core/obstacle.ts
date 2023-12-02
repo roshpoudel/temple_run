@@ -18,10 +18,10 @@ class Obstacle {
   mesh: THREE.Mesh;
 
   constructor(speed: number) {
-    const minX = -800;
-    const maxX = 800;
+    const minX = -950;
+    const maxX = 950;
     this.x = Math.random() * (maxX - minX) + minX; // TODO: Clamp it to the plane
-    this.y = -1050; // Fixed y position
+    this.y = -1100; // Fixed y position
     this.z = -2000; // Initial z position
     this.speed = speed; // Initial speed
 

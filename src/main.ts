@@ -12,6 +12,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { insideWorld } from './core/sceneSetup';
 import { Character } from './core/character';
 import Obstacle from './core/obstacle';
+import { showGameOverScreen } from './core/gamescreens';
 
 let camera: THREE.PerspectiveCamera;
 let scene: THREE.Scene;
@@ -21,16 +22,24 @@ let gameCharacter: Character;
 
 let obstacles: Obstacle[] = [];
 let lastObstacleSpawnTime = 0;
-let obstacleSpawnInterval = 5; // seconds
+let obstacleSpawnInterval = 1; // seconds
 let globalSpeedFactor = 1;
 let lastSpeedIncreaseTime = 0;
 const speedIncreaseInterval = 10; // seconds
 
-const minimumInterval = 1; // seconds
-const intervalDecrement = 0.1; // decrease interval by this amount
+const minimumInterval = 0.2; // seconds
+const intervalDecrement = 0.01; // decrease interval by this amount
 const removalPositionZ = 2100; // z-position at which obstacles are removed
 
+// Collision detection
+let isGameOver = false; // Flag to track the game over state
+
+// CLOCK
 const clock = new THREE.Clock();
+
+// CONTROLLING ANIMATION
+let animationId: number;
+let animationActive = true; // Flag to control the animation loop
 
 function fillScene() {
   scene = new THREE.Scene();
@@ -85,20 +94,11 @@ function fillScene() {
   scene.add(characterMesh);
 
   // Create and add obstacles to the scene
-  createObstacles();
+  // createObstacles();
+  createObstacle();
 }
 
 // OBSTACLES
-function createObstacles() {
-  // Create 5 obstacles for now
-  const numberOfObstacles = Math.floor(Math.random() * (10 - 5) + 5); // Random number between 10 and 20
-  for (let i = 0; i < numberOfObstacles; i += 1) {
-    const obstacle = new Obstacle(Math.random() * (10 - 0.5) + 0.5);
-    obstacles.push(obstacle);
-    scene.add(obstacle.mesh); // Add obstacle mesh to the scene
-  }
-}
-
 function createObstacle() {
   const initialSpeed = 10 * globalSpeedFactor;
   const obstacle = new Obstacle(initialSpeed);
@@ -112,7 +112,7 @@ function init() {
 
   // CAMERA
   camera = new THREE.PerspectiveCamera(75, canvasWidth / canvasHeight, 100, 20000);
-  camera.position.set(0, 2000, 4000);
+  camera.position.set(0, 0, 3700);
 
   // RENDERER
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -145,9 +145,15 @@ function render() {
 }
 
 function animate() {
-  requestAnimationFrame(animate);
+  if (!animationActive) {
+    render();
+    animationId = null;
+    return; // Stop the function if the animation should no longer be active
+  }
+
   update(clock.getDelta());
   render();
+  animationId = requestAnimationFrame(animate); // Request next frame if animation is still active
 }
 
 function onWindowResize() {
@@ -166,24 +172,45 @@ const KEY_S = 83;
 const KEY_RIGHT = 39;
 const KEY_D = 68;
 const KEY_SPACE = 32;
+const KEY_R = 82;
 // const FPS = 60;
 
 const keyState = Object.create(null) as Record<number, boolean>;
 
 window.addEventListener('keydown', (event: KeyboardEvent) => {
-  keyState[event.keyCode] = true; 
+  keyState[event.keyCode] = true;
   // Check if the spacebar is pressed
   if (event.keyCode === KEY_SPACE) {
     gameCharacter.jump(); // Call the jump method on character object
   }
+  if (event.keyCode === KEY_R) {
+    isGameOver = false; // Reset the game over flag
+
+    // Reset game stats
+    lastObstacleSpawnTime = 0;
+    obstacleSpawnInterval = 1;
+    globalSpeedFactor = 1;
+    lastSpeedIncreaseTime = 0;
+    obstacles = [];
+    scene.remove(...scene.children); // Remove all children from the scene
+    fillScene(); // Add all the objects back to the scene
+
+    // Only restart the animation loop if it is not already running
+    // This prevents multiple animation loops from running simultaneously
+    if (!animationId) {
+      animationActive = true; // Set the flag to start the animation loop
+      animate(); // Start the animation loop
+    }
+  }
 });
 
-window.addEventListener('keyup', (event: KeyboardEvent) => { 
+window.addEventListener('keyup', (event: KeyboardEvent) => {
   keyState[event.keyCode] = false;
 });
 
 function update(delta: number) {
-  let x = 0, z = 0;
+  let x = 0,
+    z = 0;
 
   if (keyState[KEY_UP] || keyState[KEY_W]) z += 1;
   if (keyState[KEY_LEFT] || keyState[KEY_A]) x += 1;
@@ -193,7 +220,7 @@ function update(delta: number) {
   gameCharacter.move(x, z);
   gameCharacter.update(delta); // Update the character for jumping and other animations
 
-  // Spawn new obstacles at regular intervals
+  // Spawn new obstacles at decreasing intervals
   if (clock.getElapsedTime() - lastObstacleSpawnTime > obstacleSpawnInterval) {
     createObstacle();
     lastObstacleSpawnTime = clock.getElapsedTime();
@@ -207,7 +234,7 @@ function update(delta: number) {
   }
 
   // move and remove obstacles
-  obstacles = obstacles.filter(obstacle => {
+  obstacles = obstacles.filter((obstacle) => {
     obstacle.move();
     if (obstacle.mesh.position.z > removalPositionZ) {
       scene.remove(obstacle.mesh);
@@ -215,7 +242,25 @@ function update(delta: number) {
     }
     return true;
   });
+
+  // Collision detection
+  obstacles.forEach((obstacle) => {
+    const distance = obstacle.mesh.position.distanceTo(gameCharacter.getMesh().position);
+
+    if (distance < 150) {
+      isGameOver = true; // Set the flag to true if a collision is detected
+      gameOver();
+    }
+  });
+
   // render();
+}
+
+function gameOver() {
+  showGameOverScreen(scene); // Display the game over screen
+  render(); // Update the rendering immediately
+  animationActive = false; // Set the flag to stop the animation loop
+  cancelAnimationFrame(animationId); // Cancel the current animation frame request
 }
 
 // setInterval(update, 1000 / FPS); // update FPS times per second
