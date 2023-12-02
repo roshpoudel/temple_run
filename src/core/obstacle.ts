@@ -11,27 +11,34 @@ class Obstacle {
 
   speed: number;
 
-  geometry: THREE.BoxGeometry;
+  geometry: THREE.SphereGeometry;
 
   material: THREE.MeshBasicMaterial;
 
   mesh: THREE.Mesh;
 
-  constructor() {
-    this.x = Math.random() * 10; // TODO: Clamp it to the plane
-    this.y = 0; // Fixed y position
-    this.z = 0; // Initial z position
-    this.speed = Math.random() * 0.5 + 0.5; // Random speed between 0.5 and 1
+  constructor(speed: number) {
+    const minX = -800;
+    const maxX = 800;
+    this.x = Math.random() * (maxX - minX) + minX; // TODO: Clamp it to the plane
+    this.y = -1050; // Fixed y position
+    this.z = -2000; // Initial z position
+    this.speed = speed; // Initial speed
 
-    this.geometry = new THREE.BoxGeometry(1, 1, 1);
-    this.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    this.geometry = new THREE.SphereGeometry(100);
+    const randomColor = Math.random() * 0xffffff; // Generate a random color
+    this.material = new THREE.MeshBasicMaterial({ color: randomColor });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.mesh.position.set(this.x, this.y, this.z); // initial position of the mesh
   }
 
-  update() {
+  move() {
     this.z += this.speed; // Move towards positive z-axis
     this.mesh.position.z = this.z; // Update the z position of the mesh
+  }
+
+  increaseSpeed(factor: number) {
+    this.speed *= factor; // Increase speed by a factor
   }
 }
 

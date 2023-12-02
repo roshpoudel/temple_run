@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable one-var */
 /* eslint-disable default-case */
 /*
@@ -16,7 +18,17 @@ let scene: THREE.Scene;
 let renderer: THREE.WebGLRenderer;
 let cameraControls: OrbitControls;
 let gameCharacter: Character;
+
 let obstacles: Obstacle[] = [];
+let lastObstacleSpawnTime = 0;
+let obstacleSpawnInterval = 5; // seconds
+let globalSpeedFactor = 1;
+let lastSpeedIncreaseTime = 0;
+const speedIncreaseInterval = 10; // seconds
+
+const minimumInterval = 1; // seconds
+const intervalDecrement = 0.1; // decrease interval by this amount
+const removalPositionZ = 2100; // z-position at which obstacles are removed
 
 const clock = new THREE.Clock();
 
@@ -65,7 +77,6 @@ function fillScene() {
   insideWorld(scene);
 
   // CHARACTER
-  // Create and add Steve character to the scene
   gameCharacter = new Character();
   const characterMesh = gameCharacter.getMesh();
   characterMesh.position.set(0, -1100, 1800);
@@ -77,14 +88,22 @@ function fillScene() {
   createObstacles();
 }
 
-// OBSATCLES
+// OBSTACLES
 function createObstacles() {
   // Create 5 obstacles for now
-  for (let i = 0; i < 5; i++) {
-    const obstacle = new Obstacle();
+  const numberOfObstacles = Math.floor(Math.random() * (10 - 5) + 5); // Random number between 10 and 20
+  for (let i = 0; i < numberOfObstacles; i += 1) {
+    const obstacle = new Obstacle(Math.random() * (10 - 0.5) + 0.5);
     obstacles.push(obstacle);
     scene.add(obstacle.mesh); // Add obstacle mesh to the scene
   }
+}
+
+function createObstacle() {
+  const initialSpeed = 10 * globalSpeedFactor;
+  const obstacle = new Obstacle(initialSpeed);
+  obstacles.push(obstacle);
+  scene.add(obstacle.mesh);
 }
 
 function init() {
@@ -122,7 +141,6 @@ function addToDOM() {
 function render() {
   const delta = clock.getDelta();
   cameraControls.update(delta);
-
   renderer.render(scene, camera);
 }
 
@@ -175,13 +193,29 @@ function update(delta: number) {
   gameCharacter.move(x, z);
   gameCharacter.update(delta); // Update the character for jumping and other animations
 
-  // Update the obstacles
-  // Update each obstacle
-  obstacles.forEach(obstacle => {
-    obstacle.update();
-  });
+  // Spawn new obstacles at regular intervals
+  if (clock.getElapsedTime() - lastObstacleSpawnTime > obstacleSpawnInterval) {
+    createObstacle();
+    lastObstacleSpawnTime = clock.getElapsedTime();
+    obstacleSpawnInterval = Math.max(minimumInterval, obstacleSpawnInterval - intervalDecrement);
+  }
 
-  render();
+  // Increase global speed factor periodically
+  if (clock.getElapsedTime() - lastSpeedIncreaseTime > speedIncreaseInterval) {
+    globalSpeedFactor += 0.1;
+    lastSpeedIncreaseTime = clock.getElapsedTime();
+  }
+
+  // move and remove obstacles
+  obstacles = obstacles.filter(obstacle => {
+    obstacle.move();
+    if (obstacle.mesh.position.z > removalPositionZ) {
+      scene.remove(obstacle.mesh);
+      return false;
+    }
+    return true;
+  });
+  // render();
 }
 
 // setInterval(update, 1000 / FPS); // update FPS times per second
