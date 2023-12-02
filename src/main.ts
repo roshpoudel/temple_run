@@ -31,9 +31,6 @@ const minimumInterval = 0.2; // seconds
 const intervalDecrement = 0.01; // decrease interval by this amount
 const removalPositionZ = 2100; // z-position at which obstacles are removed
 
-// Collision detection
-let isGameOver = false; // Flag to track the game over state
-
 // CLOCK
 const clock = new THREE.Clock();
 
@@ -184,8 +181,6 @@ window.addEventListener('keydown', (event: KeyboardEvent) => {
     gameCharacter.jump(); // Call the jump method on character object
   }
   if (event.keyCode === KEY_R) {
-    isGameOver = false; // Reset the game over flag
-
     // Reset game stats
     lastObstacleSpawnTime = 0;
     obstacleSpawnInterval = 1;
@@ -248,7 +243,6 @@ function update(delta: number) {
     const distance = obstacle.mesh.position.distanceTo(gameCharacter.getMesh().position);
 
     if (distance < 150) {
-      isGameOver = true; // Set the flag to true if a collision is detected
       gameOver();
     }
   });
