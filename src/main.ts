@@ -35,7 +35,7 @@ const removalPositionZ = 2100; // z-position at which obstacles are removed
 const clock = new THREE.Clock();
 
 // CONTROLLING ANIMATION
-let animationId: number;
+let animationId: number | undefined;
 let animationActive = true; // Flag to control the animation loop
 
 function fillScene() {
@@ -144,7 +144,7 @@ function render() {
 function animate() {
   if (!animationActive) {
     render();
-    animationId = null;
+    animationId = undefined;
     return; // Stop the function if the animation should no longer be active
   }
 
@@ -254,7 +254,9 @@ function gameOver() {
   showGameOverScreen(scene); // Display the game over screen
   render(); // Update the rendering immediately
   animationActive = false; // Set the flag to stop the animation loop
-  cancelAnimationFrame(animationId); // Cancel the current animation frame request
+  if (animationId !== undefined) {
+    cancelAnimationFrame(animationId); // Cancel the current animation frame request
+  }
 }
 
 // setInterval(update, 1000 / FPS); // update FPS times per second

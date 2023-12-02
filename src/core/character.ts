@@ -51,10 +51,10 @@ class CharacterPart {
  */
 export class Character {
   character: THREE.Object3D;
-  leftLeg: CharacterPart;
-  rightLeg: CharacterPart;
-  leftArm: CharacterPart;
-  rightArm: CharacterPart;
+  leftLeg!: CharacterPart;
+  rightLeg!: CharacterPart;
+  leftArm!: CharacterPart;
+  rightArm!: CharacterPart;
 
   pendulum: Pendulum;
 
