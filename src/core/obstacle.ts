@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { Scene, Texture } from 'three';
 
 /* eslint-disable max-len */
 const loader = new THREE.TextureLoader();
