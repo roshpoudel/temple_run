@@ -55,7 +55,6 @@ export class Character {
   rightLeg!: CharacterPart;
   leftArm!: CharacterPart;
   rightArm!: CharacterPart;
-
   pendulum: Pendulum;
 
   // following variables are used for animation of hands and legs
