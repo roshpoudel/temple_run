@@ -28,7 +28,7 @@ export function insideWorld(scene: Scene) {
   const loader = new THREE.TextureLoader();
 
   // for build version --> '/pouder0/CS360/Project6_Alpha/dist/assets/textures/groundplane/floor.png'
-  // for dev version --> '/assets/textures/groundplane/floor.png'
+  // for dev version --> '/assets/textures/groundplane/floor.png
 
   const path = '/assets/textures/groundplane/floor.png';
   // const path = '/pouder0/CS360/Project6_Alpha/dist/assets/textures/groundplane/floor.png';

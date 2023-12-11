@@ -1,7 +1,9 @@
+/* eslint-disable no-new */
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable one-var */
 /* eslint-disable default-case */
+
 /*
  * main.js
  * Author: Roshan Poudel, Sherry Khan
@@ -110,10 +112,12 @@ function fillScene() {
 // OBSTACLES
 function createObstacle() {
   const initialSpeed = 10 * globalSpeedFactor;
-  const obstacle = new Obstacle(initialSpeed, (loadedObstacle) => {
-    // This callback is called when the texture is loaded and the obstacle is ready
-    obstacles.push(loadedObstacle);
-    scene.add(loadedObstacle.mesh);
+  new Obstacle(initialSpeed, (loadedObj) => {
+    if (loadedObj instanceof Obstacle) {
+      // This ensures that loadedObj is treated as an Obstacle
+      obstacles.push(loadedObj);
+      scene.add(loadedObj.mesh);
+    }
   });
 }
 

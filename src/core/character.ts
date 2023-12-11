@@ -102,7 +102,7 @@ export class Character {
 
     // Material for the character
     const characterMaterial = new THREE.MeshPhongMaterial({
-      color: 0x00ff00,
+      color: 0x00ffff,
       specular: 0x009900,
       shininess: 30,
     });

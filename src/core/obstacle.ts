@@ -17,11 +17,11 @@ class Obstacle {
 
   geometry: THREE.SphereGeometry;
 
-  material: THREE.MeshBasicMaterial;
+  material!: THREE.MeshBasicMaterial;
 
-  mesh: THREE.Mesh;
+  mesh!: THREE.Mesh;
 
-  constructor(speed: number, onLoadCallback: (texture: THREE.Texture) => void) {
+  constructor(speed: number, onLoadCallback: (obj: Obstacle | THREE.Texture) => void) {
     const minX = -950;
     const maxX = 950;
     this.x = Math.random() * (maxX - minX) + minX;
